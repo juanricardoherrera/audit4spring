@@ -39,7 +39,7 @@ public class SendTemplateManager {
     /**
      * Clase que envía mensajes a una cola, para luego ser almacenados en ElasticSearch
      *
-     * @param level level from Level.class
+     * @param level   level from Level.class
      * @param message message to be sended
      */
     @SneakyThrows

@@ -1,0 +1,181 @@
+plugins {
+    id 'org.springframework.boot' version '2.1.9.RELEASE'
+    id 'io.spring.dependency-management' version '1.0.8.RELEASE'
+    id 'java'
+
+}
+
+group = 'com.framework'
+version = 'latest'
+sourceCompatibility = '12'
+
+
+bootJar {
+    enabled = false
+}
+
+jar {
+    enabled = true
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation "org.springframework.boot:spring-boot-starter-aop"
+
+    //Springboot starter
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+
+    //Lombok
+    annotationProcessor 'org.projectlombok:lombok'
+    implementation 'org.projectlombok:lombok'
+}
+
+
+/**
+ * To Publish code behind this
+ */
+
+// Plugins to publish
+apply plugin: 'maven-publish'
+apply plugin: 'signing'
+
+// jar with sources because it is a lib
+task sourceJar(type: Jar) {
+    classifier "sources"
+    from sourceSets.main.allJava
+}
+
+// Javadoc with but it is not necesary
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier "javadoc"
+    from javadoc.destinationDir
+}
+
+// produced artifacts
+artifacts {
+    archives jar
+    archives sourceJar
+    archives javadocJar
+}
+
+
+signing {
+    sign configurations.archives
+}
+
+//Publish code
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            customizePom(pom)
+            groupId 'io.github.kamiloj'
+            artifactId 'audit4spring'
+            version '1.0'
+
+            from components.java
+
+            // create the sign pom artifact
+            pom.withXml {
+                def pomFile = file("${project.buildDir}/generated-pom.xml")
+                writeTo(pomFile)
+                def pomAscFile = signing.sign(pomFile).signatureFiles[0]
+                artifact(pomAscFile) {
+                    classifier = null
+                    extension = 'pom.asc'
+                }
+            }
+
+            artifact(sourceJar) {
+                classifier = 'sources'
+            }
+            artifact(javadocJar) {
+                classifier = 'javadoc'
+            }
+
+
+            // create the signed artifacts
+            project.tasks.signArchives.signatureFiles.each {
+                artifact(it) {
+                    def matcher = it.file =~ /-(sources|javadoc)\.jar\.asc$/
+                    if (matcher.find()) {
+                        classifier = matcher.group(1)
+                    } else {
+                        classifier = null
+                    }
+                    extension = 'jar.asc'
+                }
+            }
+
+        }
+    }
+    repositories {
+        maven {
+            url "https://oss.sonatype.org/service/local/staging/deploy/maven2"
+            credentials {
+                username sonatypeUsername
+                password sonatypePassword
+            }
+        }
+    }
+}
+
+
+def customizePom(pom) {
+    pom.withXml {
+        def root = asNode()
+
+        // eliminate test-scoped dependencies (no need in maven central POMs)
+        root.dependencies.removeAll { dep ->
+            dep.scope == "test"
+        }
+
+        // add all items necessary for maven central publication
+        root.children().last() + {
+            resolveStrategy = Closure.DELEGATE_FIRST
+
+            description 'Serialize and Deserialize Json-LD into Java entities'
+            name 'Audit4Spring'
+            url 'https://github.com/kamiloj/audit4spring'
+            organization {
+                name 'io.github.kamiloj'
+                url 'https://github.com/kamiloj'
+            }
+            issueManagement {
+                system 'GitHub'
+                url 'https://github.com/kamiloj/audit4spring/issues'
+            }
+            licenses {
+                license {
+                    name 'MIT-Licence'
+                    url 'https://github.com/kamiloj/audit4spring/blob/master/LICENSE'
+                    distribution 'repo'
+                }
+            }
+            scm {
+                url 'https://github.com/kamiloj/audit4spring'
+                connection 'scm:git:git://github.com/kamiloj/audit4spring.git'
+                developerConnection 'scm:git:ssh://git@github.com:kamiloj/audit4spring.git'
+            }
+            developers {
+                developer {
+                    name 'KamiloJ'
+                }
+            }
+        }
+    }
+}
+
+model {
+    tasks.generatePomFileForMavenJavaPublication {
+        destination = file("$buildDir/generated-pom.xml")
+    }
+    tasks.publishMavenJavaPublicationToMavenLocal {
+        dependsOn project.tasks.signArchives
+    }
+    tasks.publishMavenJavaPublicationToMavenRepository {
+        dependsOn project.tasks.signArchives
+    }
+}

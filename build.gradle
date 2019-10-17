@@ -139,7 +139,7 @@ def customizePom(pom) {
         root.children().last() + {
             resolveStrategy = Closure.DELEGATE_FIRST
 
-            description 'Serialize and Deserialize Json-LD into Java entities'
+            description 'Generate only one audit flow, on spring methods you want audit or trace'
             name 'Audit4Spring'
             url 'https://github.com/kamiloj/audit4spring'
             organization {

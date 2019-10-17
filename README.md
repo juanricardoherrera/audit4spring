@@ -113,3 +113,8 @@ rabbit:
   username: ${RABBIT_USERNAME:guest}
   password: ${RABBIT_PASSWORD:guest}
 ```
+
+
+At last you can tag any bean method to perform audit annotation used is @TraceOperation
+
+![Alt text](/img/tag.png?raw=true "import image")

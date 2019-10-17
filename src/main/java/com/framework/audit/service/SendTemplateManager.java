@@ -25,9 +25,6 @@ public class SendTemplateManager {
     @Autowired
     SenderBeanTemplateReference senderBeanTemplateReference;
 
-
-    private MessageDigest sha1 = MessageDigest.getInstance("SHA-1");
-
     public SendTemplateManager() throws NoSuchAlgorithmException {
     }
 
@@ -49,8 +46,6 @@ public class SendTemplateManager {
             message.put("Level", level.name());
             message.put("EventTime", LocalDateTime.now().toString());
 
-            String validation = Base64.getEncoder().encodeToString(sha1.digest(message.toString().getBytes()));
-            message.put("ValidationEncode", validation);
             senderBeanTemplateReference.sendEvent(message);
             return "OK";
         });

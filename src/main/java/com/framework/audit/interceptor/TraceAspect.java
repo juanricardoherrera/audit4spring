@@ -53,14 +53,15 @@ public class TraceAspect {
             log.severe("Failed to complete the operation.");
             e.printStackTrace();
 
-            errorTrace.errorTrace(e, headers);
+            errorTrace.errorTrace(e, headers,annotation);
 
             if (annotation.overrideException())
                 throw new Exception("internal server error");
+
             throw e;
         } finally {
-            auditTrace.auditTrace(startTime, headers);
-            messageLoggerTrace.messageLoggerTrace(joinPoint, proceedResponse, headers);
+            auditTrace.auditTrace(startTime, headers,annotation);
+            messageLoggerTrace.messageLoggerTrace(joinPoint, proceedResponse, headers,annotation);
         }
 
         return proceedResponse;

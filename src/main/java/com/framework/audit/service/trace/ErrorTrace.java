@@ -1,5 +1,6 @@
 package com.framework.audit.service.trace;
 
+import com.framework.audit.interceptor.TraceOperation;
 import com.framework.audit.model.Level;
 import com.framework.audit.service.SendTemplateManager;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +16,10 @@ public class ErrorTrace {
     @Autowired
     SendTemplateManager sendTemplateManager;
 
-    public void errorTrace(Exception generalException, HashMap headers) {
+    public void errorTrace(Exception generalException, HashMap headers, TraceOperation annotation) {
+        if(!annotation.subscribeError())
+            return;
+
         HashMap<String, Object> message = new HashMap<>();
 
         message.putAll(headers);

@@ -1,6 +1,7 @@
 package com.framework.audit.service.trace;
 
 
+import com.framework.audit.interceptor.TraceOperation;
 import com.framework.audit.model.Level;
 import com.framework.audit.service.SendTemplateManager;
 import lombok.SneakyThrows;
@@ -16,8 +17,9 @@ public class AuditTrace {
     SendTemplateManager sendTemplateManager;
 
     @SneakyThrows
-    public void auditTrace(long startTime, HashMap<String, Object> headers) {
-
+    public void auditTrace(long startTime, HashMap<String, Object> headers, TraceOperation annotation) {
+        if(!annotation.subscribeAudit())
+            return;
         HashMap<String, Object> message = new HashMap<>();
 
         message.putAll(headers);

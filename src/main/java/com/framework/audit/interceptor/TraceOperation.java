@@ -8,5 +8,8 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface TraceOperation {
-    public boolean overrideException() default false;
+    public boolean overrideException() default true;
+    public boolean subscribeAudit() default true;
+    public boolean subscribeError() default true;
+    public boolean subscribeMessageLogger() default true;
 }

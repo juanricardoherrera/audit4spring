@@ -5,7 +5,10 @@ plugins {
 
 }
 
-group = 'com.framework'
+// This plugin is to install project
+apply plugin: 'maven'
+
+group = 'io.github.kamiloj'
 version = 'latest'
 sourceCompatibility = '12'
 
@@ -73,7 +76,7 @@ publishing {
             customizePom(pom)
             groupId 'io.github.kamiloj'
             artifactId 'audit4spring'
-            version '1.1'
+            version '1.2'
 
             from components.java
 

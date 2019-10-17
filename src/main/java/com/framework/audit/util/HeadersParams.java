@@ -13,7 +13,7 @@ public class HeadersParams {
     public static HashMap<String, Object> fillHeadersParams(MethodSignature signature) {
         HashMap<String, Object> headers = new HashMap<>();
         headers.put("API", System.getProperty("spring.application.name"));
-        headers.put("Service", signature.getMethod().getDeclaringClass());
+        headers.put("Service", signature.getMethod().getDeclaringClass().toGenericString());
         headers.put("Operation", signature.getMethod().getName());
 
         addHTTPRequestParams(headers);

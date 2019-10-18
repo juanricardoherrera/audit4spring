@@ -34,13 +34,16 @@ public class TraceAspect {
     @Autowired
     MessageLoggerTrace messageLoggerTrace;
 
+    @Autowired
+    HeadersParams headersParams;
+
     @Around("@annotation(com.framework.audit.interceptor.TraceOperation)")
     public Object controllerMethodsAdvice(ProceedingJoinPoint joinPoint) throws Throwable {
         long startTime = System.currentTimeMillis();
 
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
         TraceOperation annotation = signature.getMethod().getAnnotation(TraceOperation.class);
-        HashMap<String, Object> headers = HeadersParams.fillHeadersParams(signature);
+        HashMap<String, Object> headers = headersParams.fillHeadersParams(signature);
 
         Object proceedResponse = null;
 
@@ -53,15 +56,15 @@ public class TraceAspect {
             log.severe("Failed to complete the operation.");
             e.printStackTrace();
 
-            errorTrace.errorTrace(e, headers,annotation);
+            errorTrace.errorTrace(e, headers, annotation);
 
             if (annotation.overrideException())
                 throw new Exception("internal server error");
 
             throw e;
         } finally {
-            auditTrace.auditTrace(startTime, headers,annotation);
-            messageLoggerTrace.messageLoggerTrace(joinPoint, proceedResponse, headers,annotation);
+            auditTrace.auditTrace(startTime, headers, annotation);
+            messageLoggerTrace.messageLoggerTrace(joinPoint, proceedResponse, headers, annotation);
         }
 
         return proceedResponse;

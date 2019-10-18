@@ -1,6 +1,10 @@
 package com.framework.audit.util;
 
 import org.aspectj.lang.reflect.MethodSignature;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -8,11 +12,15 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.Enumeration;
 import java.util.HashMap;
 
+@Component
 public class HeadersParams {
+    @Autowired
+    private Environment env;
 
-    public static HashMap<String, Object> fillHeadersParams(MethodSignature signature) {
+    public HashMap<String, Object> fillHeadersParams(MethodSignature signature) {
         HashMap<String, Object> headers = new HashMap<>();
-        headers.put("API", System.getProperty("spring.application.name"));
+
+        headers.put("API", env.getRequiredProperty("spring.application.name"));
         headers.put("Service", signature.getMethod().getDeclaringClass().toGenericString());
         headers.put("Operation", signature.getMethod().getName());
 

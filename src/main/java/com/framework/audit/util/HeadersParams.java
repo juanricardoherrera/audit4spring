@@ -41,7 +41,7 @@ public class HeadersParams {
 
             httpHeaders.put("RequestURI", request.getRequestURI());
 
-            if (!request.getQueryString().isBlank())
+            if (request.getQueryString()!=null && !request.getQueryString().isBlank())
                 httpHeaders.put("QueryString", request.getQueryString());
 
             headers.put("HttpHeaders", httpHeaders);

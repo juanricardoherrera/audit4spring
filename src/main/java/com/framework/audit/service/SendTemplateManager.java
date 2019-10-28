@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 
 @Service
@@ -37,7 +39,8 @@ public class SendTemplateManager {
     @SneakyThrows
     public void sendMessage(Level level, HashMap<String, Object> message) {
         message.put("Level", level.name());
-        message.put("EventTime", LocalDateTime.now().toString());
+
+        message.put("EventTime", ZonedDateTime.now().toString());
 
         senderBeanTemplateReference.sendEvent(message);
     }

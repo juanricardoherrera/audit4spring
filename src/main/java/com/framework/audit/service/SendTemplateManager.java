@@ -6,14 +6,12 @@ import com.framework.audit.model.SenderBeanTemplateReference;
 import lombok.SneakyThrows;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
-import java.util.Base64;
 import java.util.HashMap;
-import java.util.concurrent.CompletableFuture;
 
 @Service
 @Log
@@ -25,10 +23,7 @@ public class SendTemplateManager {
     @Autowired
     SenderBeanTemplateReference senderBeanTemplateReference;
 
-    public SendTemplateManager() throws NoSuchAlgorithmException {
-    }
-
-
+    @Async(value = "auditThreadPoolExecutor")
     public void sendMessage(HashMap<String, Object> message) {
         sendMessage(Level.CUSTOM, message);
     }
@@ -41,13 +36,9 @@ public class SendTemplateManager {
      */
     @SneakyThrows
     public void sendMessage(Level level, HashMap<String, Object> message) {
-        CompletableFuture future = CompletableFuture.supplyAsync(() -> {
+        message.put("Level", level.name());
+        message.put("EventTime", LocalDateTime.now().toString());
 
-            message.put("Level", level.name());
-            message.put("EventTime", LocalDateTime.now().toString());
-
-            senderBeanTemplateReference.sendEvent(message);
-            return "OK";
-        });
+        senderBeanTemplateReference.sendEvent(message);
     }
 }

@@ -76,7 +76,7 @@ publishing {
             customizePom(pom)
             groupId 'io.github.kamiloj'
             artifactId 'audit4spring'
-            version '1.4'
+            version '1.5'
 
             from components.java
 

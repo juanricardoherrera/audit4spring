@@ -6,6 +6,7 @@ import com.framework.audit.model.Level;
 import com.framework.audit.service.SendTemplateManager;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -17,8 +18,9 @@ public class AuditTrace {
     SendTemplateManager sendTemplateManager;
 
     @SneakyThrows
+    @Async(value = "auditThreadPoolExecutor")
     public void auditTrace(long startTime, HashMap<String, Object> headers, TraceOperation annotation) {
-        if(!annotation.subscribeAudit())
+        if (!annotation.subscribeAudit())
             return;
         HashMap<String, Object> message = new HashMap<>();
 

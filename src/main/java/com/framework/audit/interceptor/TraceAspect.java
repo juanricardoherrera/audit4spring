@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
+import java.util.concurrent.Future;
 
 
 @Aspect
@@ -46,15 +47,16 @@ public class TraceAspect {
         HashMap<String, Object> headers = headersParams.fillHeadersParams(signature);
 
         Object proceedResponse = null;
-
         try {
             proceedResponse = joinPoint.proceed();
             headers.put("Response", "Success");
         } catch (Exception e) {
             headers.put("Response", "Failed");
 
-            log.severe("Failed to complete the operation.");
-            e.printStackTrace();
+            log.severe("Failed to complete the operation: " + headers);
+
+            // Eliminated to release log operation use error trace instead if you want to print
+            //e.printStackTrace();
 
             errorTrace.errorTrace(e, headers, annotation);
 
